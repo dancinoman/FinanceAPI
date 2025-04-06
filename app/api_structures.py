@@ -34,7 +34,7 @@ class APIStructure:
                 "function": self.function,
                 "symbol": self.symbols,
                 "apikey": self.api_key,
-                "interval": self.interval
+                "interval": self.more_params["interval"]
             }
 
             used_function = FunctionStructure(self.function)
@@ -89,9 +89,9 @@ class APIStructure:
                 return False
 
             # Handle parameter requirements
-            if function_param["requiered"]:
+            if function_param["required"]:
                 for param in params:
-                    if param not in function_param["requiered"]:
+                    if param not in function_param["required"]:
                         print(f"Missing required parameter: {param}")
                         return False
 
