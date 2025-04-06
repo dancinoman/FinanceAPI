@@ -1,7 +1,8 @@
-from fastapi import FastAPI, HTTPException, Query
+from fastapi import FastAPI, HTTPException, Request, Query
 from pydantic import BaseModel
 from typing import List, Dict
 import requests
+import time
 
 # Import classes
 from app.functions import FunctionStructure  # Assuming this exists
@@ -25,6 +26,9 @@ class ErrorResponse(BaseModel):
     detail: str
 
 class APIStructure:
+    REQUEST_HISTORY_PER_IP = {}
+    MAX_REQUESTS_PER_MINUTE_PER_IP = 5
+
     def __init__(self, api_key: str):
         self.app = FastAPI()
         self.setup_routes()
@@ -44,6 +48,7 @@ class APIStructure:
             symbol: List[str] = Query(["AAPL"], description="List of stock symbols (e.g., AAPL, MSFT)"),
             interval: str = Query("5min", description="Time interval (e.g., 1min, 5min, 15min, 30min, 60min)"),
             function: str = Query("TIME_SERIES_INTRADAY", description="Alpha Vantage function"),
+            request: Request = None
         ):
             params = {
                 "function": function,
@@ -57,7 +62,7 @@ class APIStructure:
 
             try:
                 # Raise issue if limitations symbols are exceeded
-                errors = self.handle_errors(function_param, params, symbol)
+                errors = self.handle_errors(function_param, params, symbol, request)
                 if errors:
                     raise HTTPException(status_code=400, detail=", ".join(errors))
 
@@ -112,11 +117,30 @@ class APIStructure:
         # Placeholder for cache logic
         return True
 
-    def handle_errors(self, function_param, params, symbols):
+    def handle_errors(self, function_param, params, symbols, request=None):
         """
-        Handle errors based on function parameters.
+        Handle errors based on function parameters and rate limits.
         """
         errors = []
+
+        # Rate Limiting (Example per IP)
+        if request:
+            client_ip = request.client.host
+            now = time.time()
+
+            if client_ip not in self.REQUEST_HISTORY_PER_IP:
+                self.REQUEST_HISTORY_PER_IP[client_ip] = []
+
+            self.REQUEST_HISTORY_PER_IP[client_ip][:] = [
+                t for t in self.REQUEST_HISTORY_PER_IP[client_ip] if t > now - 60
+            ]
+
+            if len(self.REQUEST_HISTORY_PER_IP[client_ip]) >= self.MAX_REQUESTS_PER_MINUTE_PER_IP:
+                errors.append(f"Too many requests from IP {client_ip}. Please try again later.")
+                return errors  # Return immediately if rate limited
+
+            self.REQUEST_HISTORY_PER_IP[client_ip].append(now)
+
         # Check if the number of symbols exceeds the limit
         if "symbol" in function_param and function_param["symbol"] < len(symbols):
             errors.append(f"Exceeded the limit of {function_param['symbol']} symbol(s).")
@@ -127,7 +151,7 @@ class APIStructure:
                 if req_param not in params:
                     errors.append(f"Missing required parameter: {req_param}")
 
-        # Check if the time delay limit is exceeded
+        # Check if the time delay limit is exceeded (this might be related to external API limits)
         if "time delay limit" in function_param and function_param["time delay limit"] < 5:
             errors.append(f"Exceeded the time delay limit of {function_param['time delay limit']} seconds.")
 
