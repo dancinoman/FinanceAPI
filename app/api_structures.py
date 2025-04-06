@@ -4,17 +4,17 @@ from typing import List
 import requests
 
 # Import classes
-from functions import FunctionStructure
+from app.functions import FunctionStructure
 
 class APIStructure:
-    def __init__(self, api_key: str, function: str, symbols: List[str], *args):
+    def __init__(self, api_key: str, function: str, symbol: List[str], more_params: dict):
         self.app = FastAPI()
         self.setup_routes()
         self.base_url = "https://www.alphavantage.co/query"
-        api_key = api_key
+        self.api_key = api_key
         self.function = function
-        self.symbols = symbols
-        self.more_params = args
+        self.symbol = symbol
+        self.more_params = more_params
 
     def setup_routes(self):
         """
@@ -26,19 +26,20 @@ class APIStructure:
             responses={400: {"model": ErrorResponse}, 500: {"model": ErrorResponse}},
         )
         async def get_intraday_stock_data(
-            symbols: List[str] = Query(["AAPL"], description="List of stock symbols (e.g., AAPL, MSFT)"),
+            symbol: List[str] = Query(["AAPL"], description="List of stock symbols (e.g., AAPL, MSFT)"),
             interval: str = Query("5min", description="Time interval (e.g., 1min, 5min, 15min, 30min, 60min)"),
         ):
 
+            print(self.more_params["interval"])
             params = {
                 "function": self.function,
-                "symbol": self.symbols,
+                "symbol": self.symbol,
                 "apikey": self.api_key,
                 "interval": self.more_params["interval"]
             }
 
             used_function = FunctionStructure(self.function)
-            function_param = used_function.function_rules(self.function, params)
+            function_param = used_function.function_rules()
 
             try:
                 # Raise issue if limitations symbols are exceeded
@@ -57,7 +58,7 @@ class APIStructure:
                     raise HTTPException(status_code=400, detail=data["Error Message"])
 
                 if not data.get(f"Time Series ({interval})"):
-                    raise HTTPException(status_code=404, detail=f"No intraday data found for {symbols} at {interval}")
+                    raise HTTPException(status_code=404, detail=f"No intraday data found for {symbol} at {interval}")
 
                 # Structure the response according to the Pydantic model
                 metadata = data.get("Meta Data", {})
@@ -79,29 +80,29 @@ class APIStructure:
             except Exception as e:
                 raise HTTPException(status_code=500, detail=f"An unexpected error occurred: {e}")
 
-        def handle_errors(self, function_param, params):
-            """
-            Handle errors based on function parameters.
-            """
-            # Check if the number of symbols exceeds the limit
-            if function_param["symbols"] < len(self.symbols):
-                print(f"Exceeded the limit of {function_param['symbols']} symbol(s).")
-                return False
+    def handle_errors(self, function_param, params):
+        """
+        Handle errors based on function parameters.
+        """
+        # Check if the number of symbols exceeds the limit
+        if function_param["symbol"] < len(self.symbol):
+            print(f"Exceeded the limit of {function_param['symbol']} symbol(s).")
+            return False
 
-            # Handle parameter requirements
-            if function_param["required"]:
-                for param in params:
-                    if param not in function_param["required"]:
-                        print(f"Missing required parameter: {param}")
-                        return False
+        # Handle parameter requirements
+        if function_param["required"]:
+            for param in params:
+                if param not in function_param["required"]:
+                    print(f"Missing required parameter: {param}")
+                    return False
 
 
-            # Check if the time delay limit is exceeded
-            if function_param["time delay limit"] < 5:
-                print(f"Exceeded the time delay limit of {function_param['time delay limit']} seconds.")
-                return False
+        # Check if the time delay limit is exceeded
+        if function_param["time delay limit"] < 5:
+            print(f"Exceeded the time delay limit of {function_param['time delay limit']} seconds.")
+            return False
 
-            return True
+        return True
 
 class StockPriceData(BaseModel):
     """Represents the structure of the intraday stock price data."""

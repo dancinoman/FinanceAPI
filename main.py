@@ -3,9 +3,7 @@ import os
 import requests
 
 #import class
-from app.functions import Functions
 from app.api_structures import APIStructure
-
 
 dotenv.load_dotenv()
 api_key = os.getenv("ALPHA_VANTAGE_API_KEY")
