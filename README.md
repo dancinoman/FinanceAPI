@@ -62,7 +62,7 @@ This API provides tailored access to stock market data, specifically focusing on
     ```bash
     uvicorn main:app --reload
     ```
-    The API will be accessible at `http://127.0.0.1:8000`.
+    The API will be accessible at `http://127.0.0.1:8000/stocks/intraday`.
 
 ### Running with Docker
 
