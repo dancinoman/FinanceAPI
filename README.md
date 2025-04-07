@@ -24,8 +24,6 @@ This API provides tailored access to stock market data, specifically focusing on
 * **Pydantic:** Used for data validation and serialization/deserialization.
 * **Requests:** For making HTTP requests to the external stock data source.
 * **Docker:** For containerization and deployment.
-* *(Optional: Mention your caching library, e.g., Redis)*
-* *(Mention your environment variable management library, e.g., python-dotenv)*
 
 ## API Endpoints
 
@@ -33,7 +31,7 @@ This API provides tailored access to stock market data, specifically focusing on
     * **Query Parameters:**
         * `symbols` (list of strings, required): A comma-separated list of stock symbols (e.g., `AAPL,MSFT`).
         * `interval` (string, optional, default: `5min`): The time interval for intraday data (e.g., `1min`, `15min`, `30min`, `60min`).
-        * `function` (string, optional, default: `TIME_SERIES_INTRADAY`): The specific Alpha Vantage time series function to use (*adjust if your API handles other functions*).
+        * `function` (string, optional, default: `TIME_SERIES_INTRADAY`): The specific Alpha Vantage time series function to use.
     * **Response:** A JSON object containing metadata and the time series data. See the response model definition in the code for details.
     * **Error Responses:** Returns JSON objects with a `detail` field for errors (e.g., invalid symbol, rate limit exceeded, data not found).
 
