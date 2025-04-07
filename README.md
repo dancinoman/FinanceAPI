@@ -83,7 +83,7 @@ This API provides tailored access to stock market data, specifically focusing on
     ```bash
     docker run -p 8000:8000 --env-file .env stock-market-api
     ```
-    The API will be accessible at `http://localhost:8000`.
+    The API will be accessible at `http://localhost:8000/stocks/intraday`.
 
 ## API Documentation
 
