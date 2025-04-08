@@ -1,5 +1,5 @@
-image_name = my-app-image
 container_name = my-running-app
+image_name = my_app
 host_port = 8080
 container_port = 80
 

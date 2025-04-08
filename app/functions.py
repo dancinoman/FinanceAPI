@@ -13,7 +13,7 @@ class FunctionStructure:
         limitations = {
             "TIME_SERIES_INTRADAY": {
                 "max_symbols": 1,
-                "intervals": ["1min", "5min", "15min", "30min", "60min"],
+                "interval": ["1min", "5min", "15min", "30min", "60min"],
                 "required": ["function","symbol", "interval"],
                 "limit": 1000
             },
