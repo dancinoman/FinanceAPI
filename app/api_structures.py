@@ -1,33 +1,13 @@
 from fastapi import FastAPI, HTTPException, Request, Query
-from pydantic import BaseModel
-from typing import List, Dict
+from typing import List
 import requests
 import time
 
 # Import classes
-from app.functions import FunctionStructure  # Assuming this exists
-
-class StockPriceData(BaseModel):
-    """Represents the structure of the intraday stock price data."""
-    timestamp: str
-    open: float
-    high: float
-    low: float
-    close: float
-    volume: int
-
-class TimeSeriesIntraday(BaseModel):
-    """Represents the structure of the Alpha Vantage intraday time series response."""
-    meta: Dict
-    time_series: Dict[str, StockPriceData]
-
-class ErrorResponse(BaseModel):
-    """Represents an error response from the API."""
-    detail: str
+from app.exception_handler import ExceptionHandler
+from app.pydantic import StockPriceData, TimeSeriesIntraday, ErrorResponse
 
 class APIStructure:
-    REQUEST_HISTORY_PER_IP = {}
-    MAX_REQUESTS_PER_MINUTE_PER_IP = 5
 
     def __init__(self, api_key: str):
         self.app = FastAPI()
@@ -57,12 +37,12 @@ class APIStructure:
                 "interval": interval,
             }
 
-            used_function = FunctionStructure(function)
+            used_function = ExceptionHandler(function)
             function_param = used_function.function_rules()
 
             try:
                 # Raise issue if limitations symbols are exceeded
-                errors = self.handle_errors(function_param, params, symbol, request)
+                errors = used_function.handle_errors(function_param, params, symbol, request)
                 if errors:
                     raise HTTPException(status_code=400, detail=", ".join(errors))
 
@@ -116,43 +96,3 @@ class APIStructure:
         """
         # Placeholder for cache logic
         return True
-
-    def handle_errors(self, function_param, params, symbols, request=None):
-        """
-        Handle errors based on function parameters and rate limits.
-        """
-        errors = []
-
-        # Rate Limiting (Example per IP)
-        if request:
-            client_ip = request.client.host
-            now = time.time()
-
-            if client_ip not in self.REQUEST_HISTORY_PER_IP:
-                self.REQUEST_HISTORY_PER_IP[client_ip] = []
-
-            self.REQUEST_HISTORY_PER_IP[client_ip][:] = [
-                t for t in self.REQUEST_HISTORY_PER_IP[client_ip] if t > now - 60
-            ]
-
-            if len(self.REQUEST_HISTORY_PER_IP[client_ip]) >= self.MAX_REQUESTS_PER_MINUTE_PER_IP:
-                errors.append(f"Too many requests from IP {client_ip}. Please try again later.")
-                return errors  # Return immediately if rate limited
-
-            self.REQUEST_HISTORY_PER_IP[client_ip].append(now)
-
-        # Check if the number of symbols exceeds the limit
-        if "symbol" in function_param and function_param["symbol"] < len(symbols):
-            errors.append(f"Exceeded the limit of {function_param['symbol']} symbol(s).")
-
-        # Handle parameter requirements
-        if function_param.get("required"):
-            for req_param in function_param["required"]:
-                if req_param not in params:
-                    errors.append(f"Missing required parameter: {req_param}")
-
-        # Check if the time delay limit is exceeded (this might be related to external API limits)
-        if "time delay limit" in function_param and function_param["time delay limit"] < 5:
-            errors.append(f"Exceeded the time delay limit of {function_param['time delay limit']} seconds.")
-
-        return errors
