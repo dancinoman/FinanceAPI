@@ -6,6 +6,7 @@ import time
 # Import classes
 from app.exception_handler import ExceptionHandler
 from app.pydantic import StockPriceData, TimeSeriesIntraday, ErrorResponse
+from app.sqlite import SQLITEDatabase
 
 class APIStructure:
 
@@ -47,7 +48,7 @@ class APIStructure:
                     raise HTTPException(status_code=400, detail=", ".join(errors))
 
                 # Check cache and fetch data
-                if self.cache_allow():
+                if self.cache():
                     pass
 
                 # Execute request
@@ -90,9 +91,8 @@ class APIStructure:
             except Exception as e:
                 raise HTTPException(status_code=500, detail=f"An unexpected error occurred: {e}")
 
-    def cache_allow(self):
+    def cache(self):
         """
-        Check if the cache is allowed.
+        Use cache to store date
         """
-        # Placeholder for cache logic
-        return True
+        db = SQLITEDatabase("stocks.db")
