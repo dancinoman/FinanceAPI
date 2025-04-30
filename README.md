@@ -12,10 +12,11 @@ This API provides tailored access to stock market data, specifically focusing on
 * **Customizable Queries:** Allows users to specify stock symbols and time intervals through query parameters.
 * **Structured Response:** Returns data in a well-defined JSON format based on Pydantic models for easy integration.
 * **Rate Limiting:** Implements basic rate limiting to ensure fair usage and prevent overloading the external data source.
-* **Caching:** Integrates a caching strategy (e.g., Redis - *upcoming implementing*) to improve response times and reduce load on the upstream API.
 * **Error Handling:** Provides informative error responses for invalid requests or issues with the external data source.
 * **Dockerized:** Fully containerized using Docker, making it easy to deploy and run in various environments.
 * **Built with FastAPI:** Leverages the speed, robustness, and automatic documentation features of the FastAPI framework.
+* **Caching:** Integrates a caching strategy (e.g., Redis - *upcoming implementing*) to improve response times and reduce load on the upstream API.
+* **MongoDB** Store the data collected into designed TSDB ( *upcoming implementing)
 
 ## Technology Stack
 
