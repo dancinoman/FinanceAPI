@@ -16,7 +16,7 @@ jobs:
 
       - name: Use secret in env var
         env:
-          GH_PAT: ${{ secrets.GH_PAT }
+          GH_PAT: ${{ secrets.GH_PAT }}
 
       - name: Run a basic test (placeholder)
         run: echo "✅ Tests passed!"
