@@ -5,6 +5,9 @@ on:
     branches: [ ci/cd ]
   pull_request:
     branches: [ ci/cd ]
+    
+permissions:
+  contents: write
 
 jobs:
   build:
