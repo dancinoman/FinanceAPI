@@ -6,7 +6,6 @@ import time
 # Import classes
 from app.exception_handler import ExceptionHandler
 from app.pydantic import StockPriceData, TimeSeriesIntraday, ErrorResponse
-from app.sqlite import SQLITEDatabase
 
 class APIStructure:
 
@@ -95,4 +94,4 @@ class APIStructure:
         """
         Use cache to store date
         """
-        db = SQLITEDatabase("stocks.db")
+        

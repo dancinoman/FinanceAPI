@@ -1,0 +1,3 @@
+[90m[main 2025-04-28T00:20:52.526Z][0m updateURL https://api2.cursor.sh/updates/api/update/linux-x64/cursor/0.49.6/9b5316c2a498d41b82aa44979830216c2eaaf697b891b5b4cfef22cbc703b08b/stable
+[90m[main 2025-04-28T00:20:52.526Z][0m update#setState idle
+[90m[main 2025-04-28T00:21:17.375Z][0m Extension host with pid 3313 exited with code: 0, signal: unknown.
