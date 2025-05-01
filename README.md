@@ -3,7 +3,7 @@
 ![FastAPI](https://img.shields.io/badge/FastAPI-Powered-green.svg)
 ![Build Status](https://github.com/dancinoman/FinanceAPI/actions/workflows/.github/workflows/ci.yaml/badge.svg)
 
-Current Version: `{{VERSION}}`
+Current Version: `1.2.0`
 
 ## Overview
 
