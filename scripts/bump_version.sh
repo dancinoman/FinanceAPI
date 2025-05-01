@@ -1,19 +1,17 @@
-      - name: Bump version
-        run: bash scripts/bump_version.sh patch
+#!/bin/bash
 
-      - name: Update version in README
-        run: bash scripts/update_readme.sh
+PART=${1:-patch}  # Accept "major", "minor", or "patch" (default to patch)
 
-      - name: Commit and push version bump
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add VERSION README.md
-          git commit -m "ci: bump version to $(cat VERSION)" || echo "No changes to commit"
-          git push
+read -r MAJOR MINOR PATCH <<<$(cat VERSION | tr '.' ' ')
 
-      - name: Create Git tag
-        run: |
-          VERSION=$(cat VERSION)
-          git tag "v$VERSION"
-          git push origin "v$VERSION"
+case $PART in
+  major) ((MAJOR+=1)); MINOR=0; PATCH=0 ;;
+  minor) ((MINOR+=1)); PATCH=0 ;;
+  patch) ((PATCH+=1)) ;;
+  *) echo "Invalid part: use major, minor, or patch"; exit 1 ;;
+esac
+
+NEW_VERSION="${MAJOR}.${MINOR}.${PATCH}"
+echo "$NEW_VERSION" > VERSION
+
+echo "Bumped version to $NEW_VERSION"
