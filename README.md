@@ -1,6 +1,9 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 ![Dockerized](https://img.shields.io/badge/Docker-Ready-blue.svg)
 ![FastAPI](https://img.shields.io/badge/FastAPI-Powered-green.svg)
+![Build Status](https://github.com/dancinoman/FinanceAPI/actions/workflows/.github/workflows/ci.yaml/badge.svg)
+
+Current Version: `{{VERSION}}`
 
 ## Overview
 
