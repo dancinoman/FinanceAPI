@@ -1,0 +1,12 @@
+{
+  "major": 1,
+  "minor": 2,
+  "patch": 0,
+  "release": "alpha",
+  "date": "2025-05-10",
+  "description": "Initial release of the application with basic features.",
+  "features": [
+    "FastApi",
+    "Docker"
+  ]
+}
