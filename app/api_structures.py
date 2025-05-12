@@ -18,6 +18,8 @@ class APIStructure:
     def setup_routes(self):
         """
         Setup the API routes with main variables.
+        Returns: 
+            formatted_response: time series fetched by API and Pydantic tested.
         """
         @self.app.get(
             "/stocks/intraday",
@@ -66,7 +68,9 @@ class APIStructure:
                 metadata = data.get("Meta Data", {})
                 time_series_data = data.get(time_series_key, {})
                 formatted_time_series = {}
-                for timestamp, values in time_series_data.items():
+                
+                # Time series format data
+                 for timestamp, values in time_series_data.items():
                     stock_data = StockPriceData(
                         timestamp=timestamp,
                         open=float(values.get("1. open")),
