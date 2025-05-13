@@ -11,5 +11,5 @@ api_key = os.getenv("ALPHA_VANTAGE_API_KEY")
 if not api_key:
     raise ValueError("API_KEY environment variable not set")
 
-api_instance = APIStructure(api_key)
-app = api_instance.app
+app = APIStructure(api_key).app
+print("To test params: /stocks/intraday?symbol=GOOGL&interval=5min")
