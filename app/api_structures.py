@@ -1,4 +1,5 @@
 from fastapi import FastAPI, HTTPException, Request, Query
+import json
 from typing import List
 import requests
 import time
@@ -21,6 +22,14 @@ class APIStructure:
         Returns: 
             formatted_response: time series fetched by API and Pydantic tested.
         """
+        @self.app.get("/")
+        async def root():
+            return {
+                "message": "Error no params",
+                "testing": "/stocks/intraday?symbol=GOOGL&interval=5min",
+                "more info"    : "/docs"
+            }
+            
         @self.app.get(
             "/stocks/intraday",
             response_model=TimeSeriesIntraday,
@@ -49,7 +58,7 @@ class APIStructure:
                     raise HTTPException(status_code=400, detail=", ".join(errors))
 
                 # Check cache and fetch data
-                if self.cache():
+                if self.manage_cache():
                     pass
 
                 # Execute request
@@ -94,7 +103,7 @@ class APIStructure:
             except Exception as e:
                 raise HTTPException(status_code=500, detail=f"An unexpected error occurred: {e}")
 
-    def cache(self):
+    def manage_cache(self):
         """
         Use cache to store date
         """
