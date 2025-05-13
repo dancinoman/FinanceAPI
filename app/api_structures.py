@@ -70,7 +70,7 @@ class APIStructure:
                 formatted_time_series = {}
                 
                 # Time series format data
-                 for timestamp, values in time_series_data.items():
+                for timestamp, values in time_series_data.items():
                     stock_data = StockPriceData(
                         timestamp=timestamp,
                         open=float(values.get("1. open")),
