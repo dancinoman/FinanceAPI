@@ -1,5 +1,4 @@
 from fastapi import FastAPI, HTTPException, Request, Query
-import json
 from typing import List
 import requests
 import time
@@ -15,6 +14,10 @@ class APIStructure:
         self.setup_routes()
         self.base_url = "https://www.alphavantage.co/query"
         self.api_key = api_key
+        self.cache = {}
+        fake_db = {
+            "123": {"id": "123", "value": "From DB"}
+        }
 
     def setup_routes(self):
         """
@@ -22,6 +25,19 @@ class APIStructure:
         Returns: 
             formatted_response: time series fetched by API and Pydantic tested.
         """
+""""        async def get_data_from_cache_or_db(item_id: str):
+            # Check cache
+            if item_id in cache:
+                print("Cache hit")
+                return cache[item_id]
+            # Check DB
+            print("Cache miss, checking DB")
+            data = fake_db.get(item_id)
+            if data:
+                cache[item_id] = data  # Save to cache
+                return data
+            raise HTTPException(status_code=404, detail="Item not found")""""
+         
         @self.app.get("/")
         async def root():
             return {
