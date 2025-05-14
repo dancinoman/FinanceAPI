@@ -6,7 +6,9 @@ import time
 # Import classes
 from app.exception_handler import ExceptionHandler
 from app.pydantic import StockPriceData, TimeSeriesIntraday, ErrorResponse
-
+from app.database import Redis
+# TODO:Add redis cache to store data
+# TODO:fix put real data timeseries for pydantic in cache to test
 class APIStructure:
 
     def __init__(self, api_key: str):
@@ -14,30 +16,14 @@ class APIStructure:
         self.setup_routes()
         self.base_url = "https://www.alphavantage.co/query"
         self.api_key = api_key
-        self.cache = {}
-        fake_db = {
-            "123": {"id": "123", "value": "From DB"}
-        }
+        self.redis = Redis()
 
     def setup_routes(self):
         """
         Setup the API routes with main variables.
-        Returns: 
+        Returns:
             formatted_response: time series fetched by API and Pydantic tested.
         """
-""""        async def get_data_from_cache_or_db(item_id: str):
-            # Check cache
-            if item_id in cache:
-                print("Cache hit")
-                return cache[item_id]
-            # Check DB
-            print("Cache miss, checking DB")
-            data = fake_db.get(item_id)
-            if data:
-                cache[item_id] = data  # Save to cache
-                return data
-            raise HTTPException(status_code=404, detail="Item not found")""""
-         
         @self.app.get("/")
         async def root():
             return {
@@ -45,7 +31,7 @@ class APIStructure:
                 "testing": "/stocks/intraday?symbol=GOOGL&interval=5min",
                 "more info"    : "/docs"
             }
-            
+
         @self.app.get(
             "/stocks/intraday",
             response_model=TimeSeriesIntraday,
@@ -57,6 +43,17 @@ class APIStructure:
             function: str = Query("TIME_SERIES_INTRADAY", description="Alpha Vantage function"),
             request: Request = None
         ):
+            print("Symbols:", symbol)
+            print("Interval:", interval)
+
+            cache_key = self.redis.get_key(symbol, interval)
+            print("Cache Key:", cache_key)
+            if cache_key in self.redis.cache:
+                print("Cache hit")
+                return self.redis.cache[cache_key]
+
+            print("Cache miss, fetching data from API")
+
             params = {
                 "function": function,
                 "symbol": ",".join(symbol),
@@ -93,7 +90,7 @@ class APIStructure:
                 metadata = data.get("Meta Data", {})
                 time_series_data = data.get(time_series_key, {})
                 formatted_time_series = {}
-                
+
                 # Time series format data
                 for timestamp, values in time_series_data.items():
                     stock_data = StockPriceData(
@@ -123,4 +120,3 @@ class APIStructure:
         """
         Use cache to store date
         """
-        
