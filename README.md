@@ -19,7 +19,6 @@ This API provides tailored access to stock market data, specifically focusing on
 * **Dockerized:** Fully containerized using Docker, making it easy to deploy and run in various environments.
 * **Built with FastAPI:** Leverages the speed, robustness, and automatic documentation features of the FastAPI framework.
 * **Caching:** Integrates a caching strategy (e.g., Redis - *upcoming implementing*) to improve response times and reduce load on the upstream API.
-* **MongoDB** Store the data collected into designed TSDB ( *upcoming implementing*)
 
 ## Technology Stack
 
